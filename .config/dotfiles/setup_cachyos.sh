@@ -41,7 +41,20 @@ sudo paru -Syu --noconfirm "${PACKAGES[@]}"
 # ============================================
 
 git clone --bare "$DOTFILES_REPO" "$DOTFILES_DIR"
-git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout
+
+if git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout; then
+  echo "Restored dotfiles successfully"
+else
+  echo "Removing default config files..."
+  git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout 2>&1 | grep -E "\s+\." | awk '{print $1}' | xargs -I % rm "$HOME/%"
+  if git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout; then
+    echo "Finished restoring dotfiles"
+  else
+    echo "Failed to restore dotfiles"
+    exit 1
+  fi
+fi
+
 git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" config status.showUntrackedFiles no
 
 # ============================================
@@ -52,4 +65,4 @@ systemctl --user enable dms
 dms greeter enable
 dms greeter sync
 
-echo "Dotfiles restored, packages installed, default browser set, and DMS Niri installed!"
+echo "Dotfiles restored, packages installed, and DMS Niri installed!"
