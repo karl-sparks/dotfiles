@@ -56,6 +56,7 @@ else
 fi
 
 git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" config status.showUntrackedFiles no
+git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" push --set-upstream origin main
 
 # ============================================
 # 3. Start DMS Niri
